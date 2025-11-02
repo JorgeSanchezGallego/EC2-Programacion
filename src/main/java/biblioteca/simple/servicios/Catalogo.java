@@ -30,16 +30,22 @@ public class Catalogo {
         }
 
     public List<Producto> buscar(String titulo){
+        List<Producto> todo = new ArrayList<>();
+        todo.addAll(listaPrestables);
+        todo.addAll(listaVendibles);
         List<Producto> resultado = new ArrayList<>();
-        for (Producto p : listaPrestables){
+        for (Producto p : todo){
             if (p.getTitulo().toLowerCase().contains(titulo.toLowerCase())) resultado.add(p);
         }
         return resultado;
     }
 
     public List<Producto> buscar(int anio){
+        List<Producto> todo = new ArrayList<>();
+        todo.addAll(listaPrestables);
+        todo.addAll(listaVendibles);
         List<Producto> resultado = new ArrayList<>();
-        for (Producto p : listaPrestables){
+        for (Producto p : todo){
             if (Integer.parseInt(p.getAnio()) == anio) resultado.add(p);
         }
         return resultado;

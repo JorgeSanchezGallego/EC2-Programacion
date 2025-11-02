@@ -76,8 +76,8 @@ public class Main {
 
     private static void buscarPorTitulo(){
         System.out.println("Titulo");
-        String t = teclado.nextLine();
-        catalogo.buscar(t).forEach(p -> System.out.println("- " + p));
+        String titulo = teclado.nextLine();
+        catalogo.buscar(titulo).forEach(p -> System.out.println("- " + p));
 
     }
 
@@ -91,6 +91,51 @@ public class Main {
 
     private static void prestar(){
         List<Producto> disponible = catalogo.listar().stream().filter(p -> p instanceof Prestable pN && !pN.estaPrestado()).collect(Collectors.toList());
+        disponible.forEach(System.out::println);
+        Usuario usuarioParaPrestar = comprobarExistenciaUser();
+        if (usuarioParaPrestar != null){
+            //TODO
+        } else {
+            System.out.println("Volviendo...");
+        }
+
+    }
+
+    private static Usuario buscarUsuarioPorNombre(String nombre) {
+        for (Usuario u : usuarios) {
+            if (u.getNombre().equalsIgnoreCase(nombre)) {
+                return u;
+            }
+        }
+        return null;
+    }
+
+    private static Usuario comprobarExistenciaUser(){
+        System.out.println("Nombre del usuario?");
+        String nombre = teclado.nextLine();
+
+        Usuario user = buscarUsuarioPorNombre(nombre);
+
+        if (user == null){
+            System.out.println("Usuario no encontrado");
+            System.out.println("Desea crear el nuevo usuario)");
+            String respuesta = teclado.nextLine();
+
+            if (respuesta.equalsIgnoreCase("si")){
+                user = altaUsuario(nombre);
+            } else {
+                throw new IllegalStateException("Operación cancelada");
+            }
+        }
+        System.out.println("Usuario: " +user.getNombre() + "Encontrado");
+        return user
+    }
+
+    private static Usuario altaUsuario(String nombre){
+        Usuario nuevoUsuario = new Usuario(nombre);
+        usuarios.add(nuevoUsuario);
+        System.out.println("Usuario " + nuevoUsuario.getNombre() + "añadido");
+        return nuevoUsuario;
     }
 
 
