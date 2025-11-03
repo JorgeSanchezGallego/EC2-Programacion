@@ -77,6 +77,7 @@ public class Videojuego extends Producto implements Prestable {
         ("\tAño:        ") +anio +"\n" +
         ("\tFormato:    ") +formato +"\n" +
         ("\tPEGI:       ") +PEGI +"\n" +
+        ("\tPrestado:   ") +prestado +"\n" +
 
 
         ("\t-----------------\n")+

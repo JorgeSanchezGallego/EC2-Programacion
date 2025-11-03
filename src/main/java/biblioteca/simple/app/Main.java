@@ -91,12 +91,27 @@ public class Main {
 
     private static void prestar(){
         List<Producto> disponible = catalogo.listar().stream().filter(p -> p instanceof Prestable pN && !pN.estaPrestado()).collect(Collectors.toList());
+        if (disponible.isEmpty()){
+            System.out.println("No hay articulos para alquilar");
+            return;
+        }
+        System.out.println("Productos disponibles");
         disponible.forEach(System.out::println);
         Usuario usuarioParaPrestar = comprobarExistenciaUser();
+
         if (usuarioParaPrestar != null){
-            //TODO
-        } else {
-            System.out.println("Volviendo...");
+            System.out.println("Introduce el ID del producto a alquilar");
+            int idElegido = teclado.nextInt();
+            teclado.nextLine();
+            boolean encontrado = false;
+            for (Producto producto : disponible){
+                if (producto.getId() == idElegido){
+                    producto.prestar(usuarioParaPrestar);
+                    System.out.println("Producto " + producto.getTitulo()+ " prestado a " + usuarioParaPrestar.getNombre());
+                    break;
+                }
+            }
+
         }
 
     }
@@ -118,23 +133,24 @@ public class Main {
 
         if (user == null){
             System.out.println("Usuario no encontrado");
-            System.out.println("Desea crear el nuevo usuario)");
+            System.out.println("Desea crear el nuevo usuario? si/no");
             String respuesta = teclado.nextLine();
 
             if (respuesta.equalsIgnoreCase("si")){
                 user = altaUsuario(nombre);
             } else {
-                throw new IllegalStateException("Operación cancelada");
+                System.out.println("Operación cancelada");
+                return null;
             }
         }
-        System.out.println("Usuario: " +user.getNombre() + "Encontrado");
-        return user
+        System.out.println("Usuario: " +user.getNombre() + " Encontrado");
+        return user;
     }
 
     private static Usuario altaUsuario(String nombre){
         Usuario nuevoUsuario = new Usuario(nombre);
         usuarios.add(nuevoUsuario);
-        System.out.println("Usuario " + nuevoUsuario.getNombre() + "añadido");
+        System.out.println("Usuario '" + nuevoUsuario.getNombre() + "' añadido");
         return nuevoUsuario;
     }
 

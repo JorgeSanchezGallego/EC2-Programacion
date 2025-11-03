@@ -22,6 +22,8 @@ public class Libro extends Producto implements Prestable {
         this.ISBN = ISBN;
     }
 
+
+
     public String getISBN() {
         return ISBN;
     }
@@ -29,6 +31,8 @@ public class Libro extends Producto implements Prestable {
     public String getAutor() {
         return autor;
     }
+
+
 
     @Override public void prestar(Usuario u){
         if (prestado)throw  new IllegalStateException("Ya prestado");
@@ -69,6 +73,7 @@ public class Libro extends Producto implements Prestable {
                 ("\tAutor:      ") +autor +"\n" +
                 ("\tAño:        ") +anio +"\n" +
                 ("\tFormato:    ") +formato +"\n" +
+                ("\tPrestado:   ") +prestado +"\n" +
 
 
 

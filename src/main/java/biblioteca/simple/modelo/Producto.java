@@ -21,7 +21,7 @@ public abstract class Producto {
         this.formato = formato;
     }
 
-    protected int getId() {
+    public int getId() {
         return id;
     }
 
@@ -46,5 +46,8 @@ public abstract class Producto {
                 ", anio='" + anio + '\'' +
                 ", formato=" + formato +
                 '}';
+    }
+
+    public void prestar(Usuario usuarioParaPrestar) {
     }
 }

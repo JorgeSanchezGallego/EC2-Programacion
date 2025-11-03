@@ -29,6 +29,7 @@ public class Pelicula extends Producto implements Prestable {
         return minutosDuracion;
     }
 
+
     @Override public void prestar(Usuario u){
         if (prestado)throw new IllegalStateException("Ya prestado");
         this.prestado = true;
@@ -66,6 +67,7 @@ public class Pelicula extends Producto implements Prestable {
                 ("\tDirector:   ") +director +"\n" +
                 ("\tAño:        ") +anio +"\n" +
                 ("\tFormato:    ") +formato +"\n" +
+                ("\tPrestado:   ") +prestado +"\n" +
 
 
 
