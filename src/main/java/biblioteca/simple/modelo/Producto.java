@@ -48,6 +48,5 @@ public abstract class Producto {
                 '}';
     }
 
-    public void prestar(Usuario usuarioParaPrestar) {
-    }
+
 }

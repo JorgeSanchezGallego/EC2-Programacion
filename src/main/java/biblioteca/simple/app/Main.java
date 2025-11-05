@@ -25,12 +25,12 @@ public class Main {
         catalogo.alta(new Pelicula(3, "El Padrino", "1972", Formato.FISICO,"Francis Ford", 175));
         catalogo.alta(new Pelicula(4, "Parasitos", "2019", Formato.FISICO,"Bong Joon-ho", 132));
         catalogo.alta(new Videojuego(5, "Call Of Duty", "2022", Formato.DIGITAL, "18", Genero.SHOOTER, Plataforma.PC));
-        catalogo.alta(new Videojuego(7, "Mario Kart 8 Deluxe", "2017", Formato.FISICO, "3", Genero.DEPORTES, Plataforma.SWITCH));
-        catalogo.alta(new Videojuego(8, "StarCraft II", "2010", Formato.DIGITAL, "16", Genero.ESTRATEGIA, Plataforma.PC));
-        catalogo.alta(new Merchandising(9, "Funko Pop: Darth Vader", "2021", Formato.FISICO, "Figura", 15.99));
-        catalogo.alta(new Merchandising(10, "Camiseta Logo Zelda", "2023", Formato.FISICO, "Ropa", 22.50));
-        catalogo.alta(new Merchandising(11, "Taza Casa Stark (GoT)", "2019", Formato.FISICO, "Taza", 12.95));
-        catalogo.alta(new Merchandising(12, "Póster The Last of Us", "2022", Formato.FISICO, "Póster", 9.99));
+        catalogo.alta(new Videojuego(6, "Mario Kart 8 Deluxe", "2017", Formato.FISICO, "3", Genero.DEPORTES, Plataforma.SWITCH));
+        catalogo.alta(new Videojuego(7, "StarCraft II", "2010", Formato.DIGITAL, "16", Genero.ESTRATEGIA, Plataforma.PC));
+        catalogo.alta(new Merchandising(8, "Funko Pop: Darth Vader", "2021", Formato.FISICO, "Figura", 15.99));
+        catalogo.alta(new Merchandising(9, "Camiseta Logo Zelda", "2023", Formato.FISICO, "Ropa", 22.50));
+        catalogo.alta(new Merchandising(10, "Taza Casa Stark (GoT)", "2019", Formato.FISICO, "Taza", 12.95));
+        catalogo.alta(new Merchandising(11, "Póster The Last of Us", "2022", Formato.FISICO, "Póster", 9.99));
 
         usuarios.add(new Usuario(1,"Jorge"));
         usuarios.add(new Usuario(2,"Maria"));
@@ -103,14 +103,15 @@ public class Main {
             System.out.println("Introduce el ID del producto a alquilar");
             int idElegido = teclado.nextInt();
             teclado.nextLine();
-            boolean encontrado = false;
             for (Producto producto : disponible){
                 if (producto.getId() == idElegido){
-                    producto.prestar(usuarioParaPrestar);
+                    Prestable pPrestable = (Prestable) producto;
+                    pPrestable.prestar(usuarioParaPrestar);
                     System.out.println("Producto " + producto.getTitulo()+ " prestado a " + usuarioParaPrestar.getNombre());
-                    break;
+                    return;
                 }
             }
+            System.out.println("Producto no disponible");
 
         }
 
@@ -148,10 +149,18 @@ public class Main {
     }
 
     private static Usuario altaUsuario(String nombre){
-        Usuario nuevoUsuario = new Usuario(nombre);
+        int nuevoId;
+        if (usuarios.isEmpty()){
+            nuevoId=1;
+        } else {
+            Usuario ultimoUsuario = usuarios.get(usuarios.size()-1);
+            nuevoId = ultimoUsuario.getId() + 1;
+        }
+        Usuario nuevoUsuario = new Usuario(nuevoId, nombre);
         usuarios.add(nuevoUsuario);
         System.out.println("Usuario '" + nuevoUsuario.getNombre() + "' añadido");
         return nuevoUsuario;
+
     }
 
 
