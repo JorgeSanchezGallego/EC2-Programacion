@@ -1,6 +1,7 @@
 package biblioteca.simple.app;
 
 import biblioteca.simple.contratos.Prestable;
+import biblioteca.simple.contratos.Vendible;
 import biblioteca.simple.modelo.*;
 import biblioteca.simple.servicios.Catalogo;
 
@@ -9,6 +10,14 @@ import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
 
+/**
+ * Clase principal de la aplicación de biblioteca.
+ * Gestiona el menú de usuario, la carga de datos inicial y
+ * la interacción con el catálogo y la lista de usuarios.
+ *
+ * @author Jorge Sánchez
+ * @version 1.0
+ */
 public class Main {
     private static final Catalogo catalogo = new Catalogo();
     private static final List<Usuario> usuarios = new ArrayList<>();
@@ -19,6 +28,10 @@ public class Main {
         menu();
     }
 
+    /**
+     * Carga un conjunto de datos de prueba iniciales en el catálogo
+     * y en la lista de usuarios para el funcionamiento de la aplicación.
+     */
     private static void cargarDatos(){
         catalogo.alta(new Libro(1, "El Quijote", "1608", Formato.FISICO,"22342455", "Cervantes"));
         catalogo.alta(new Libro(2, "El nombre del viento", "2007", Formato.FISICO,"223245234", "Patrick Rothfuss"));
@@ -36,6 +49,11 @@ public class Main {
         usuarios.add(new Usuario(2,"Maria"));
     }
 
+    /**
+     * Muestra el menú principal de opciones al usuario en un bucle.
+     * Lee la selección del usuario y llama al método correspondiente
+     * hasta que el usuario elige la opción de salir (0).
+     */
     private static void menu(){
         int opcion;
 
@@ -45,7 +63,10 @@ public class Main {
             System.out.println(" ### 2- Buscar por titulo###");
             System.out.println(" ### 3- Buscar por año ###");
             System.out.println(" ### 4- Prestar producto ###");
-            System.out.println(" ### 5- Devolver producto ###");
+            System.out.println(" ### 5- Comprar producto ###");
+            System.out.println(" ### 6- Devolver producto ###");
+            System.out.println(" ### 7- Alta usuario ###");
+            System.out.println(" ### 8- Mostrar usuarios ###");
             System.out.println(" ### 0- Salir ###");
             while (!teclado.hasNextInt()) teclado.next();
             opcion = teclado.nextInt();
@@ -55,7 +76,10 @@ public class Main {
                 case 2 -> buscarPorTitulo();
                 case 3-> buscarPorAnio();
                 case 4-> prestar();
-                //case 5 -> devolver();
+                case 5 -> comprar();
+                case 6 -> devolver();
+                case 7 -> altaUsuario();
+                case 8 -> mostrarUsuarios();
                 case 0 -> System.out.println("Adios!");
                 default -> System.out.println("Opción no valida");
             }
@@ -64,6 +88,10 @@ public class Main {
         } while (opcion !=0);
     }
 
+    /**
+     * Muestra por consola la lista completa de productos del catálogo.
+     * Si el catálogo está vacío, muestra un mensaje informativo.
+     */
     private static void listar(){
         List<Producto> lista = catalogo.listar();
         if (lista.isEmpty()){
@@ -74,6 +102,10 @@ public class Main {
         for (Producto p : lista) System.out.println("-" + p);
     }
 
+    /**
+     * Pide al usuario un título por teclado y muestra todos los
+     * productos del catálogo que coinciden con dicho título.
+     */
     private static void buscarPorTitulo(){
         System.out.println("Titulo");
         String titulo = teclado.nextLine();
@@ -81,6 +113,10 @@ public class Main {
 
     }
 
+    /**
+     * Pide al usuario un año por teclado y muestra todos los
+     * productos del catálogo que coinciden con dicho año.
+     */
     private static void buscarPorAnio(){
         System.out.println("Titulo");
         int a = teclado.nextInt();
@@ -89,6 +125,11 @@ public class Main {
 
     }
 
+    /**
+     * Gestiona el proceso de prestar un producto.
+     * Muestra los productos prestables disponibles, comprueba el usuario,
+     * y si es válido, registra el préstamo del producto seleccionado.
+     */
     private static void prestar(){
         List<Producto> disponible = catalogo.listar().stream().filter(p -> p instanceof Prestable pN && !pN.estaPrestado()).collect(Collectors.toList());
         if (disponible.isEmpty()){
@@ -117,6 +158,75 @@ public class Main {
 
     }
 
+    /**
+     * Gestiona el proceso de comprar un producto.
+     * Muestra los productos vendibles disponibles, comprueba el usuario,
+     * y si es válido, registra la venta del producto seleccionado.
+     */
+    private static void comprar(){
+        List<Producto> disponible = catalogo.listar().stream().filter(p -> p instanceof Vendible pN && !pN.estaVendido()).collect(Collectors.toList());
+        if (disponible.isEmpty()){
+            System.out.println("No hay articulos para vender");
+            return;
+        }
+        System.out.println("Productos disponibles");
+        disponible.forEach(System.out::println);
+        Usuario usuarioParaVender = comprobarExistenciaUser();
+        if (usuarioParaVender != null){
+            System.out.println("Introduce el ID del producto a vender");
+            int idElegido = teclado.nextInt();
+            teclado.nextLine();
+            for (Producto producto : disponible){
+                if (producto.getId() == idElegido){
+                    Vendible pPrestable = (Vendible) producto;
+                    pPrestable.vender(usuarioParaVender);
+                    System.out.println("Producto " + producto.getTitulo()+ " vendido a " + usuarioParaVender.getNombre());
+                    return;
+                }
+            }
+            System.out.println("Producto no disponible");
+
+        }
+    }
+
+    /**
+     * Gestiona el proceso de devolver un producto previamente prestado.
+     * Muestra los productos que están actualmente prestados,
+     * pide un ID y registra la devolución.
+     */
+    private static void devolver(){
+        List<Producto> disponibleParaDevolver = catalogo.listar().stream().filter(p -> p instanceof Prestable pN && pN.estaPrestado()).collect(Collectors.toList());
+        if (disponibleParaDevolver.isEmpty()){
+            System.out.println("No hay articulos para devolver");
+            return;
+        }
+        System.out.println("Productos disponibles para devolver");
+        disponibleParaDevolver.forEach(System.out::println);
+
+
+            System.out.println("Introduce el ID del producto a devolver");
+            int idElegido = teclado.nextInt();
+            teclado.nextLine();
+            for (Producto producto : disponibleParaDevolver){
+                if (producto.getId() == idElegido){
+                    Prestable pPrestable = (Prestable) producto;
+                    pPrestable.devolver();
+                    System.out.println("Producto " + producto.getTitulo()+ " devuelto");
+                    return;
+                }
+                System.out.println("Producto no disponible");
+
+
+        }
+    }
+
+    /**
+     * Busca un usuario en la lista global de usuarios por su nombre.
+     * La búsqueda ignora mayúsculas y minúsculas.
+     *
+     * @param nombre El nombre del usuario a buscar.
+     * @return El objeto Usuario si se encuentra, o 'null' si no existe.
+     */
     private static Usuario buscarUsuarioPorNombre(String nombre) {
         for (Usuario u : usuarios) {
             if (u.getNombre().equalsIgnoreCase(nombre)) {
@@ -126,6 +236,14 @@ public class Main {
         return null;
     }
 
+    /**
+     * Pide un nombre de usuario y comprueba si existe.
+     * Si el usuario no existe, ofrece la posibilidad de darlo de alta
+     * en el momento.
+     *
+     * @return El Usuario (ya sea encontrado o recién creado), o 'null' si la
+     * operación es cancelada por el usuario.
+     */
     private static Usuario comprobarExistenciaUser(){
         System.out.println("Nombre del usuario?");
         String nombre = teclado.nextLine();
@@ -138,7 +256,7 @@ public class Main {
             String respuesta = teclado.nextLine();
 
             if (respuesta.equalsIgnoreCase("si")){
-                user = altaUsuario(nombre);
+                user = altaUsuario();
             } else {
                 System.out.println("Operación cancelada");
                 return null;
@@ -148,11 +266,26 @@ public class Main {
         return user;
     }
 
-    private static Usuario altaUsuario(String nombre){
+    /**
+     * Da de alta a un nuevo usuario en el sistema pidiendo los datos por teclado.
+     * Comprueba si el usuario ya existe (ignorando mayúsculas/minúsculas)
+     * antes de crearlo. Asigna un ID numérico automáticamente.
+     *
+     * @return El objeto Usuario creado, o 'null' si el usuario ya existía.
+     */
+    private static Usuario altaUsuario(){
+        System.out.println("Nombre del usuario: ");
+        String nombre = teclado.nextLine();
         int nuevoId;
+        for (Usuario u: usuarios){
+            if (u.getNombre().equalsIgnoreCase(nombre)){
+                System.out.println("El usuario '" + nombre + "' ya existe.");
+                return null;
+            }
+        }
         if (usuarios.isEmpty()){
             nuevoId=1;
-        } else {
+        }  else {
             Usuario ultimoUsuario = usuarios.get(usuarios.size()-1);
             nuevoId = ultimoUsuario.getId() + 1;
         }
@@ -161,6 +294,14 @@ public class Main {
         System.out.println("Usuario '" + nuevoUsuario.getNombre() + "' añadido");
         return nuevoUsuario;
 
+    }
+
+    /**
+     * Muestra por consola la lista completa de usuarios registrados
+     * en el sistema, utilizando su método 'toString()'.
+     */
+    private static void mostrarUsuarios(){
+        usuarios.forEach(System.out::println);
     }
 
 
