@@ -118,7 +118,7 @@ public class Main {
      * productos del catálogo que coinciden con dicho año.
      */
     private static void buscarPorAnio(){
-        System.out.println("Titulo");
+        System.out.println("Año");
         int a = teclado.nextInt();
         teclado.nextLine();
         catalogo.buscar(a).forEach(p -> System.out.println("- " + p));
