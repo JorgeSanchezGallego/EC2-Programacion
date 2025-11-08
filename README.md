@@ -49,6 +49,11 @@ El menú de la consola se ha rediseñado con caracteres ASCII para ofrecer una e
 ### 3. Documentación Javadoc Exhaustiva
 Todo el código fuente (clases, métodos, atributos) ha sido documentado profesionalmente con Javadoc, explicando el propósito de cada elemento, sus parámetros (`@param`) y sus valores de retorno (`@return`). La documentación generada está lista para ser consultada.
 
+### 4. Pruebas Unitarias (JUnit)
+Para garantizar la robustez y el correcto funcionamiento de la lógica de negocio, se han implementado pruebas unitarias (tests) con **JUnit 5**. Se ha creado una suite de tests en la carpeta `src/test/java` que valida el comportamiento de las clases más críticas:
+* **`CatalogoTest`**: Comprueba que el alta, listado y, especialmente, los métodos de búsqueda (`buscarPorTitulo`) funcionan como se espera, manejando casos de éxito y casos donde no se encuentran resultados.
+* **`LibroTest`**: Valida la lógica de estado de la interfaz `Prestable`. Se asegura de que un libro no pueda ser prestado dos veces seguidas (lanzando la `IllegalStateException` esperada) y que los métodos `estaPrestado()` y `devolver()` modifican el estado correctamente.
+
 ---
 
 ## 🛠️ Arquitectura y Diseño Técnico
@@ -63,6 +68,8 @@ El proyecto sigue una estructura de paquetes clara (`app`, `contratos`, `modelo`
   * Se utiliza la biblioteca **Gson** de Google para la serialización y deserialización.
   * Para la importación, se utiliza un `TypeToken` para convertir correctamente el JSON de un *array* de usuarios de nuevo a una `List<Usuario>` en Java.
   * La importación se realiza al inicio (`cargarDatos()`) y la exportación al final (`menu()`, `case 0`), haciendo la persistencia transparente para el usuario.
+* **Pruebas Unitarias:**
+  * Se utiliza **JUnit 5** (a través de Maven con `scope=test`) para la validación de la lógica de negocio en un directorio `src/test/java` separado.
 
 ---
 
@@ -70,5 +77,40 @@ El proyecto sigue una estructura de paquetes clara (`app`, `contratos`, `modelo`
 
 * **Lenguaje:** Java (JDK 17+)
 * **Gestión de Dependencias:** Maven
+* **Pruebas:** JUnit 5
 * **Biblioteca JSON:** Google Gson (`com.google.code.gson`)
 * **Documentación:** Javadoc (con `maven-javadoc-plugin`)
+* **IDE:** IntelliJ IDEA
+
+---
+
+## 🚀 Cómo Ejecutar
+
+1.  Clonar este repositorio.
+2.  Abrir el proyecto en un IDE (IntelliJ IDEA).
+3.  El IDE detectará el archivo `pom.xml` y descargará automáticamente las dependencias (Gson y JUnit).
+4.  Localizar y ejecutar el método `main()` en la clase `biblioteca.simple.app.Main`.
+5.  **Para ejecutar los tests:** Hacer clic derecho en la carpeta `src/test/java` y seleccionar "Run Tests".
+
+---
+
+## 📸 Vistazo a la Aplicación
+
+*Así se ve el nuevo menú principal de la biblioteca:*
+
+```sh
+╔══════════════════════════════════╗
+║    📚 Menú de la Biblioteca 📚   ║
+╠══════════════════════════════════╣
+║ 1. Listar                        ║
+║ 2. Buscar por título             ║
+║ 3. Buscar por año                ║
+║ 4. Prestar producto              ║
+║ 5. Comprar producto              ║
+║ 6. Devolver producto             ║
+║ 7. Alta usuario                  ║
+║ 8. Mostrar usuarios              ║
+╟──────────────────────────────────╢
+║ 0. Salir                         ║
+╚══════════════════════════════════╝
+  -> Introduce tu opción:
