@@ -5,10 +5,19 @@ import biblioteca.simple.contratos.Vendible;
 import biblioteca.simple.modelo.*;
 import biblioteca.simple.servicios.Catalogo;
 
+import java.io.FileNotFoundException;
+import java.io.FileReader;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.stream.Collectors;
+import java.io.FileWriter;
+import java.io.IOException;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
 /**
  * Clase principal de la aplicación de biblioteca.
@@ -31,8 +40,20 @@ public class Main {
     /**
      * Carga un conjunto de datos de prueba iniciales en el catálogo
      * y en la lista de usuarios para el funcionamiento de la aplicación.
+     * PRIMERO intenta cargar usuarios desde JSON.
      */
     private static void cargarDatos(){
+        importarUsuarios();
+        if (usuarios.isEmpty()){
+            System.out.println("No se encontraron usuarios, cargando datos de prueba");
+            usuarios.add(new Usuario(1,"Jorge"));
+            usuarios.add(new Usuario(2,"Ander"));
+            usuarios.add(new Usuario(3,"Joa"));
+            usuarios.add(new Usuario(4,"Daniel"));
+            usuarios.add(new Usuario(5,"Kenneth"));
+        }
+
+
         catalogo.alta(new Libro(1, "El Quijote", "1608", Formato.FISICO,"22342455", "Cervantes"));
         catalogo.alta(new Libro(2, "El nombre del viento", "2007", Formato.FISICO,"223245234", "Patrick Rothfuss"));
         catalogo.alta(new Pelicula(3, "El Padrino", "1972", Formato.FISICO,"Francis Ford", 175));
@@ -45,8 +66,7 @@ public class Main {
         catalogo.alta(new Merchandising(10, "Taza Casa Stark (GoT)", "2019", Formato.FISICO, "Taza", 12.95));
         catalogo.alta(new Merchandising(11, "Póster The Last of Us", "2022", Formato.FISICO, "Póster", 9.99));
 
-        usuarios.add(new Usuario(1,"Jorge"));
-        usuarios.add(new Usuario(2,"Maria"));
+
     }
 
     /**
@@ -58,16 +78,21 @@ public class Main {
         int opcion;
 
         do {
-            System.out.println("\n ### Menú de la biblioteca ###");
-            System.out.println(" ### 1- Listar ###");
-            System.out.println(" ### 2- Buscar por titulo###");
-            System.out.println(" ### 3- Buscar por año ###");
-            System.out.println(" ### 4- Prestar producto ###");
-            System.out.println(" ### 5- Comprar producto ###");
-            System.out.println(" ### 6- Devolver producto ###");
-            System.out.println(" ### 7- Alta usuario ###");
-            System.out.println(" ### 8- Mostrar usuarios ###");
-            System.out.println(" ### 0- Salir ###");
+            System.out.println("\n╔══════════════════════════════════╗");
+            System.out.println("║    📚 Menú de la Biblioteca 📚   ║");
+            System.out.println("╠══════════════════════════════════╣");
+            System.out.println("║ 1. Listar                        ║");
+            System.out.println("║ 2. Buscar por título             ║");
+            System.out.println("║ 3. Buscar por año                ║");
+            System.out.println("║ 4. Prestar producto              ║");
+            System.out.println("║ 5. Comprar producto              ║");
+            System.out.println("║ 6. Devolver producto             ║");
+            System.out.println("║ 7. Alta usuario                  ║");
+            System.out.println("║ 8. Mostrar usuarios              ║");
+            System.out.println("╟──────────────────────────────────╢");
+            System.out.println("║ 0. Salir                         ║");
+            System.out.println("╚══════════════════════════════════╝");
+            System.out.print("  -> Introduce tu opción: ");
             while (!teclado.hasNextInt()) teclado.next();
             opcion = teclado.nextInt();
             teclado.nextLine();
@@ -80,7 +105,10 @@ public class Main {
                 case 6 -> devolver();
                 case 7 -> altaUsuario();
                 case 8 -> mostrarUsuarios();
-                case 0 -> System.out.println("Adios!");
+                case 0 -> {
+                    exportarUsuarios();
+                    System.out.println("Adios!");
+                }
                 default -> System.out.println("Opción no valida");
             }
 
@@ -118,10 +146,15 @@ public class Main {
      * productos del catálogo que coinciden con dicho año.
      */
     private static void buscarPorAnio(){
-        System.out.println("Año");
-        int a = teclado.nextInt();
-        teclado.nextLine();
-        catalogo.buscar(a).forEach(p -> System.out.println("- " + p));
+        try {
+            System.out.println("Año");
+            int a = teclado.nextInt();
+            teclado.nextLine();
+            catalogo.buscar(a).forEach(p -> System.out.println("- " + p));
+        } catch (InputMismatchException e){
+            System.out.println("Por favor, introduce un año valido");
+        }
+
 
     }
 
@@ -140,20 +173,24 @@ public class Main {
         disponible.forEach(System.out::println);
         Usuario usuarioParaPrestar = comprobarExistenciaUser();
 
-        if (usuarioParaPrestar != null){
-            System.out.println("Introduce el ID del producto a alquilar");
-            int idElegido = teclado.nextInt();
-            teclado.nextLine();
-            for (Producto producto : disponible){
-                if (producto.getId() == idElegido){
-                    Prestable pPrestable = (Prestable) producto;
-                    pPrestable.prestar(usuarioParaPrestar);
-                    System.out.println("Producto " + producto.getTitulo()+ " prestado a " + usuarioParaPrestar.getNombre());
-                    return;
+        try {
+            if (usuarioParaPrestar != null){
+                System.out.println("Introduce el ID del producto a alquilar");
+                int idElegido = teclado.nextInt();
+                teclado.nextLine();
+                for (Producto producto : disponible){
+                    if (producto.getId() == idElegido){
+                        Prestable pPrestable = (Prestable) producto;
+                        pPrestable.prestar(usuarioParaPrestar);
+                        System.out.println("Producto " + producto.getTitulo()+ " prestado a " + usuarioParaPrestar.getNombre());
+                        return;
+                    }
                 }
-            }
-            System.out.println("Producto no disponible");
+                System.out.println("Producto no disponible");
 
+            }
+        } catch (InputMismatchException e){
+            System.out.println("Por favor, introduce un ID, no una letra");
         }
 
     }
@@ -172,21 +209,25 @@ public class Main {
         System.out.println("Productos disponibles");
         disponible.forEach(System.out::println);
         Usuario usuarioParaVender = comprobarExistenciaUser();
-        if (usuarioParaVender != null){
-            System.out.println("Introduce el ID del producto a vender");
-            int idElegido = teclado.nextInt();
-            teclado.nextLine();
-            for (Producto producto : disponible){
-                if (producto.getId() == idElegido){
-                    Vendible pPrestable = (Vendible) producto;
-                    pPrestable.vender(usuarioParaVender);
-                    System.out.println("Producto " + producto.getTitulo()+ " vendido a " + usuarioParaVender.getNombre());
-                    return;
+        try {
+            if (usuarioParaVender != null) {
+                System.out.println("Introduce el ID del producto a vender");
+                int idElegido = teclado.nextInt();
+                teclado.nextLine();
+                for (Producto producto : disponible) {
+                    if (producto.getId() == idElegido) {
+                        Vendible pPrestable = (Vendible) producto;
+                        pPrestable.vender(usuarioParaVender);
+                        System.out.println("Producto " + producto.getTitulo() + " vendido a " + usuarioParaVender.getNombre());
+                        return;
+                    }
                 }
+                System.out.println("Producto no disponible");
             }
-            System.out.println("Producto no disponible");
-
+        } catch (InputMismatchException e ){
+            System.out.println("Por favor introduce un ID, no una letra");
         }
+
     }
 
     /**
@@ -204,20 +245,22 @@ public class Main {
         disponibleParaDevolver.forEach(System.out::println);
 
 
-            System.out.println("Introduce el ID del producto a devolver");
-            int idElegido = teclado.nextInt();
-            teclado.nextLine();
-            for (Producto producto : disponibleParaDevolver){
-                if (producto.getId() == idElegido){
-                    Prestable pPrestable = (Prestable) producto;
-                    pPrestable.devolver();
-                    System.out.println("Producto " + producto.getTitulo()+ " devuelto");
-                    return;
-                }
-                System.out.println("Producto no disponible");
-
-
-        }
+           try {
+               System.out.println("Introduce el ID del producto a devolver");
+               int idElegido = teclado.nextInt();
+               teclado.nextLine();
+               for (Producto producto : disponibleParaDevolver) {
+                   if (producto.getId() == idElegido) {
+                       Prestable pPrestable = (Prestable) producto;
+                       pPrestable.devolver();
+                       System.out.println("Producto " + producto.getTitulo() + " devuelto");
+                       return;
+                   }
+                   System.out.println("Producto no disponible");
+               }
+           } catch (InputMismatchException e){
+               System.out.println("Por favor introduce un ID, no una letra");
+           }
     }
 
     /**
@@ -302,6 +345,47 @@ public class Main {
      */
     private static void mostrarUsuarios(){
         usuarios.forEach(System.out::println);
+    }
+
+
+    /**
+     * Exporta la lista actual de usuarios a un fichero JSON.
+     * Utiliza Gson para la serialización (convertir de Java a JSON).
+     */
+    private static void exportarUsuarios(){
+        Gson gson = new GsonBuilder().setPrettyPrinting().create();
+        try (FileWriter writer = new FileWriter("usuarios.json")){
+            gson.toJson(usuarios, writer);
+            System.out.println("Usuarios guardados en usuarios.json");
+        } catch (IOException e){
+            System.out.println("Error, no se pudo guardar el fichero JSON");
+            e.printStackTrace();
+        }
+    }
+
+    /**
+     * Importa la lista de usuarios desde un fichero JSON.
+     * Si el fichero existe, carga los usuarios en la lista 'usuarios' del Main.
+     * Si no existe, informa por consola y la lista quedará vacía (para
+     * que la cargue 'cargarDatos' con los de prueba).
+     */
+    private static void importarUsuarios(){
+        Gson gson = new Gson();
+
+        try (FileReader reader = new FileReader("usuarios.json")){
+            Type tipoLista = new TypeToken<ArrayList<Usuario>>(){}.getType();
+            List<Usuario> usuariosLeidos = gson.fromJson(reader, tipoLista);
+            if (usuariosLeidos != null) {
+                usuarios.clear();
+                usuarios.addAll(usuariosLeidos);
+                System.out.println("LOG: Usuarios cargados desde usuarios.json");
+            }
+        } catch (FileNotFoundException e){
+            System.out.println("El fichero usuarios.json no existe");
+        } catch (IOException e){
+            System.out.println("No se pudo leer el archivo");
+            e.printStackTrace();
+        }
     }
 
 

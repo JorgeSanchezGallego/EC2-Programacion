@@ -1,6 +1,6 @@
-# Proyecto Biblioteca 2.0 - EC 2
+# Proyecto Biblioteca - Evaluación Continua 2
 
-Este proyecto corresponde a la **Segunda Evaluación Continua (EC 2)** de la asignatura de Programación. El objetivo es ampliar una aplicación de consola existente de gestión de una biblioteca.
+Este proyecto corresponde a la **Segunda Evaluación Continua (EC 2)** de la asignatura de Programación. El objetivo es ampliar una aplicación de consola existente de gestión de una biblioteca, aplicando herencia, interfaces y persistencia de datos.
 
 * **Alumno:** Jorge Sánchez
 * **Curso:** 1º Desarrollo de Aplicaciones Web (DAW)
@@ -10,70 +10,65 @@ Este proyecto corresponde a la **Segunda Evaluación Continua (EC 2)** de la asi
 
 ## 📋 Descripción del Proyecto
 
-Partiendo de una aplicación base que gestionaba `Libros` y `Películas`, esta tarea consiste en ampliar el sistema para que sea más robusto y completo.
+Partiendo de una aplicación base, esta tarea consistía en ampliar el sistema para incluir nuevos tipos de productos (`Videojuego`), mejorar la gestión de usuarios (altas manuales y "al vuelo") y añadir persistencia de datos para los usuarios mediante JSON.
 
-Los objetivos de esta ampliación eran:
-1.  **Ampliar la jerarquía de clases** para incluir el nuevo tipo de producto `Videojuego`.
-2.  **Mejorar la gestión de usuarios**, permitiendo su creación manual y "al vuelo" durante un préstamo.
-3.  **Añadir persistencia de datos** para los usuarios mediante exportación/importación JSON.
-
-Adicionalmente a los requisitos solicitados, **el proyecto incluye como ampliación personal** la creación de una nueva interfaz `Vendible` y una clase `Merchandising`, para demostrar una jerarquía de clases más compleja y la coexistencia de diferentes tipos de contratos (interfaces).
+Además de los requisitos mínimos, este proyecto ha sido ampliado con funcionalidades adicionales para demostrar una comprensión más profunda de la Programación Orientada a Objetos y la gestión de proyectos.
 
 ---
 
 ## ✨ Funcionalidades Implementadas
 
-El menú de la aplicación ha sido modificado para incluir las nuevas funcionalidades, ofreciendo:
+La aplicación presenta un menú de consola interactivo con las siguientes funcionalidades:
 
-* **Listar Catálogo Completo:** Muestra todos los productos (Libros, Películas, Videojuegos y Merchandising).
-* **Buscar por Título / Año:** Filtra el catálogo según los criterios del usuario.
-* **Prestar Producto:**
-    * Permite prestar cualquier ítem que sea `Prestable` (Libros, Películas y el nuevo `Videojuego`).
-    * Solicita el ID de un usuario.
-    * **Mejora clave:** Si el usuario introducido no existe, el sistema ofrece crearlo en ese mismo momento sin cancelar la operación de préstamo.
-* **Devolver Producto:** Libera un producto que estaba prestado.
+* **Gestión del Catálogo:**
+  * Listar todos los productos (Libros, Películas, Videojuegos y Merchandising).
+  * Buscar productos por título o por año de lanzamiento.
+* **Gestión de Préstamos:**
+  * Permite prestar cualquier ítem `Prestable` (Libro, Película, Videojuego).
+  * Permite devolver productos prestados.
 * **Gestión de Usuarios:**
-    * **Crear Usuario Manualmente:** Una opción de menú dedicada para dar de alta nuevos usuarios.
-    * **Exportar Usuarios a JSON:** Guarda la lista actual de usuarios en un archivo `usuarios.json`.
-    * **Importar Usuarios desde JSON:** Carga la lista de usuarios desde `usuarios.json`.
-* **Salir:** Cierra la aplicación.
+  * **Alta manual:** Opción de menú dedicada para crear nuevos usuarios.
+  * **Alta "al vuelo":** Si se intenta un préstamo para un usuario que no existe, el sistema ofrece crearlo en el momento sin abortar la operación.
+  * Mostrar la lista completa de usuarios.
+* **Persistencia de Datos:**
+  * **Importación automática:** Al iniciar, la aplicación carga la lista de usuarios desde `usuarios.json`.
+  * **Exportación automática:** Al salir, la aplicación guarda la lista actualizada de usuarios en `usuarios.json`, asegurando que los nuevos usuarios creados persistan.
 
 ---
 
-## 🛠️ Estructura Técnica y Diseño
+## 🌟 Ampliaciones Personales (Extras)
 
-Para cumplir con los requisitos, el proyecto se ha estructurado siguiendo los principios de la Programación Orientada a Objetos:
+Para ir más allá de los requisitos de la evaluación, el proyecto incluye las siguientes mejoras:
 
-### 1. Herencia e Interfaces
+### 1. Interfaz `Vendible` y clase `Merchandising`
+Se ha añadido una nueva interfaz `Vendible` (con métodos `vender()` y `estaVendido()`) y una clase `Merchandising` que la implementa. Esto demuestra un diseño de interfaces paralelo a `Prestable`, permitiendo que el catálogo gestione productos que se prestan y productos que se venden, cada uno con su propio contrato.
 
-* **`Producto` (Clase Abstracta):** Sirve como clase base para todos los artículos del catálogo.
-* **`Videojuego` (Clase Requerida):**
-    * Hereda de `Producto`.
-    * Añade atributos propios (p.ej., `Plataforma`, `Genero`, `PEGI`).
-    * Implementa la interfaz `Prestable`.
-* **`Merchandising` (Ampliación Personal):**
-    * Hereda de `Producto`.
-    * Representa artículos que no se prestan pero se venden (figuras, tazas, ropa).
-    * Implementa la interfaz `Vendible`.
+### 2. Mejora Visual de la Interfaz (CLI)
+El menú de la consola se ha rediseñado con caracteres ASCII para ofrecer una experiencia de usuario más limpia, profesional y agradable que un simple listado de texto.
 
-### 2. Contratos (Interfaces)
-
-* **`Prestable` (Interfaz Requerida):** Contrato que define el comportamiento de préstamo (`prestar()`, `devolver()`, `estaPrestado()`). Es implementado por `Libro`, `Pelicula` y `Videojuego`.
-* **`Vendible` (Interfaz Personal):** Contrato de creación propia para definir el comportamiento de los productos que tienen un precio y pueden ser vendidos. Es implementado por `Merchandising`.
-
-### 3. Gestión de Usuarios y Préstamos
-
-La lógica de préstamo (`prestar()`) ha sido modificada para ser más flexible. En lugar de abortar la operación si un usuario no existe, se encapsula la lógica de "comprobar o crear" en un método (`comprobarExistenciaUser()`), mejorando la experiencia de usuario.
-
-### 4. Persistencia con JSON
-
-Se han implementado métodos para la serialización (guardado) y deserialización (lectura) de la lista de `Usuario` a un archivo `usuarios.json`, permitiendo que los datos de usuario persistan entre ejecuciones.
+### 3. Documentación Javadoc Exhaustiva
+Todo el código fuente (clases, métodos, atributos) ha sido documentado profesionalmente con Javadoc, explicando el propósito de cada elemento, sus parámetros (`@param`) y sus valores de retorno (`@return`). La documentación generada está lista para ser consultada.
 
 ---
 
-## 🚀 Cómo Ejecutar
+## 🛠️ Arquitectura y Diseño Técnico
 
-1.  Clonar este repositorio.
-2.  Abrir el proyecto en un IDE (como IntelliJ IDEA).
-3.  Asegurarse de tener configurado el JDK de Java.
-4.  Ejecutar el método `main()` en la clase `biblioteca.simple.app.Main`.
+El proyecto sigue una estructura de paquetes clara (`app`, `contratos`, `modelo`, `servicios`) y se basa en los siguientes pilares de la POO:
+
+* **Herencia:** Todos los artículos del catálogo (`Libro`, `Pelicula`, `Videojuego`, `Merchandising`) heredan de una clase abstracta `Producto`.
+* **Interfaces (Contratos):** Se utilizan para definir comportamientos específicos que no todos los productos comparten.
+  * **`Prestable`:** Implementado por `Libro`, `Pelicula` y `Videojuego`.
+  * **`Vendible`:** Implementado por `Merchandising`.
+* **Persistencia JSON:**
+  * Se utiliza la biblioteca **Gson** de Google para la serialización y deserialización.
+  * Para la importación, se utiliza un `TypeToken` para convertir correctamente el JSON de un *array* de usuarios de nuevo a una `List<Usuario>` en Java.
+  * La importación se realiza al inicio (`cargarDatos()`) y la exportación al final (`menu()`, `case 0`), haciendo la persistencia transparente para el usuario.
+
+---
+
+## 💻 Stack Tecnológico
+
+* **Lenguaje:** Java (JDK 17+)
+* **Gestión de Dependencias:** Maven
+* **Biblioteca JSON:** Google Gson (`com.google.code.gson`)
+* **Documentación:** Javadoc (con `maven-javadoc-plugin`)
