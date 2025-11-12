@@ -15,6 +15,8 @@ import java.util.Scanner;
 import java.util.stream.Collectors;
 import java.io.FileWriter;
 import java.io.IOException;
+
+import biblioteca.simple.servicios.PersistenciaUsuarios;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.reflect.TypeToken;
@@ -348,43 +350,26 @@ public class Main {
     }
 
 
-    /**
-     * Exporta la lista actual de usuarios a un fichero JSON.
-     * Utiliza Gson para la serialización (convertir de Java a JSON).
-     */
+
     private static void exportarUsuarios(){
-        Gson gson = new GsonBuilder().setPrettyPrinting().create();
-        try (FileWriter writer = new FileWriter("usuarios.json")){
-            gson.toJson(usuarios, writer);
-            System.out.println("Usuarios guardados en usuarios.json");
-        } catch (IOException e){
-            System.out.println("Error, no se pudo guardar el fichero JSON");
-            e.printStackTrace();
+        try {
+            PersistenciaUsuarios.exportar(usuarios);
+            System.out.println("Usuarios exportados correctamente");
+        } catch (Exception e) {
+            System.out.println("Error al exportar usuarios " + e.getMessage());
         }
     }
 
-    /**
-     * Importa la lista de usuarios desde un fichero JSON.
-     * Si el fichero existe, carga los usuarios en la lista 'usuarios' del Main.
-     * Si no existe, informa por consola y la lista quedará vacía (para
-     * que la cargue 'cargarDatos' con los de prueba).
-     */
-    private static void importarUsuarios(){
-        Gson gson = new Gson();
 
-        try (FileReader reader = new FileReader("usuarios.json")){
-            Type tipoLista = new TypeToken<ArrayList<Usuario>>(){}.getType();
-            List<Usuario> usuariosLeidos = gson.fromJson(reader, tipoLista);
-            if (usuariosLeidos != null) {
-                usuarios.clear();
-                usuarios.addAll(usuariosLeidos);
-                System.out.println("LOG: Usuarios cargados desde usuarios.json");
-            }
-        } catch (FileNotFoundException e){
-            System.out.println("El fichero usuarios.json no existe");
-        } catch (IOException e){
-            System.out.println("No se pudo leer el archivo");
-            e.printStackTrace();
+
+    private static void importarUsuarios(){
+        try {
+            List<Usuario> cargados = PersistenciaUsuarios.importar();
+            usuarios.clear();
+            usuarios.addAll(cargados);
+            System.out.println("Usuarios cargados con éxito");
+        } catch (Exception e){
+            System.out.println("Error al importar: " + e.getMessage());
         }
     }
 
